@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مختبر البوابات المنطقية</title>
+
+<style>
+:root {
+  --bg: #07111e;
+  --card: #102136;
+  --border: #25445c;
+  --cyan: #4de1ef;
+  --green: #53f3a5;
+  --gold: #ffd166;
+  --text: #f0f7ff;
+  --muted: #a8bfd3;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top left, #143c51, transparent 35%),
+    radial-gradient(circle at bottom right, #12332e, transparent 30%),
+    var(--bg);
+  font-family: Tahoma, Arial, sans-serif;
+  line-height: 1.8;
+}
+
+header {
+  text-align: center;
+  padding: 30px 15px;
+  border-bottom: 1px solid var(--border);
+  background: #06101be8;
+}
+
+header h1 {
+  font-size: clamp(25px, 5vw, 40px);
+  margin: 10px 0;
+}
+
+header h1 span {
+  color: var(--cyan);
+}
+
+header p {
+  color: var(--muted);
+  max-width: 700px;
+  margin: auto;
+}
+
+.badge {
+  display: inline-block;
+  color: var(--cyan);
+  border: 1px solid var(--cyan);
+  border-radius: 30px;
+  padding: 4px 14px;
+  font-size: 12px;
+}
+
+.container {
+  max-width: 1100px;
+  margin: auto;
+  padding: 18px 12px 40px;
+}
+
+.gate-menu {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 7px;
+  margin-bottom: 18px;
+}
+
+.gate-button {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: white;
+  padding: 10px 3px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: .2s;
+}
+
+.gate-button small {
+  display: block;
+  font-weight: normal;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.gate-button.active,
+.gate-button:hover {
+  background: #174052;
+  border-color: var(--cyan);
+  box-shadow: 0 0 15px #4de1ef30;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.card {
+  background: linear-gradient(145deg, #102136, #0b1726);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 18px;
+  min-width: 0;
+  box-shadow: 0 10px 30px #0003;
+}
+
+.card h2 {
+  margin-top: 0;
+}
+
+.label {
+  color: var(--cyan);
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.title-row h2 {
+  font-size: 25px;
+  margin: 4px 0;
+}
+
+.pill {
+  color: var(--cyan);
+  background: #17374a;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+svg {
+  display: block;
+  width: 100%;
+  max-height: 220px;
+  margin: 12px auto;
+}
+
+.wire {
+  stroke: #91b5cc;
+  stroke-width: 3;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.gate-shape {
+  stroke: var(--cyan);
+  stroke-width: 3;
+  fill: #12364a;
+}
+
+.svg-text {
+  fill: white;
+  font-size: 16px;
+  font-family: Arial, sans-serif;
+}
+
+.inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.input-box {
+  text-align: center;
+  padding: 12px 6px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #091522;
+}
+
+.input-box strong {
+  display: block;
+  font-size: 20px;
+}
+
+.input-controls {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.input-controls button {
+  width: 50px;
+  padding: 8px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #152a3e;
+  color: white;
+  font-size: 17px;
+  cursor: pointer;
+}
+
+.input-controls button.selected {
+  background: var(--green);
+  color: #062015;
+  border-color: var(--green);
+  box-shadow: 0 0 12px #53f3a555;
+}
+
+.output-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: #07131e;
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  padding: 15px;
+  margin-top: 15px;
+}
+
+.output-caption {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.output-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.led {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #293944;
+  border: 3px solid #496174;
+  transition: .2s;
+}
+
+.led.on {
+  background: var(--green);
+  border-color: #c5ffe0;
+  box-shadow: 0 0 12px var(--green), 0 0 25px #53f3a577;
+}
+
+.output-value {
+  font-size: 30px;
+  font-weight: bold;
+}
+
+.formula {
+  direction: ltr;
+  text-align: center;
+  background: #07131e;
+  border: 1px dashed #75663b;
+  color: var(--gold);
+  border-radius: 12px;
+  padding: 12px;
+  margin: 12px 0;
+  font-family: Consolas, monospace;
+  font-size: 25px;
+}
+
+.explanation {
+  padding: 12px;
+  background: #0a1928;
+  border-right: 3px solid var(--cyan);
+  border-radius: 8px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+  margin-top: 12px;
+}
+
+th, td {
+  padding: 9px;
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  color: var(--cyan);
+  background: #10283a;
+}
+
+tr.current {
+  background: #174052;
+  outline: 1px solid var(--cyan);
+}
+
+.one {
+  color: var(--green);
+  font-weight: bold;
+}
+
+.zero {
+  color: #ff7b89;
+  font-weight: bold;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.action-button {
+  background: #152b40;
+  border: 1px solid var(--border);
+  color: white;
+  padding: 9px 13px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.action-button.primary {
+  background: var(--cyan);
+  color: #03131c;
+  font-weight: bold;
+}
+
+.action-button:active,
+.gate-button:active {
+  transform: scale(.97);
+}
+
+.full {
+  grid-column: 1 / -1;
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.step {
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #0a1928;
+}
+
+.step b {
+  color: var(--gold);
+}
+
+footer {
+  text-align: center;
+  color: var(--muted);
+  padding: 18px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+}
+
+@media(max-width: 760px) {
+  .gate-menu {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .full {
+    grid-column: auto;
+  }
+
+  .steps {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media(max-width: 360px) {
+  .gate-menu {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .card {
+    padding: 12px;
+  }
+
+  .formula {
+    font-size: 20px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <span class="badge">DIGITAL ELECTRONICS LAB</span>
+
+  <h1>
+    مختبر <span>البوابات المنطقية</span>
+  </h1>
+
+  <p>
+    مشروع تفاعلي لتعلّم البوابات المنطقية السبعة،
+    وفهم المعادلات وجداول الحقيقة بطريقة عملية.
+  </p>
+</header>
+
+<main class="container">
+
+  <div class="gate-menu" id="gateMenu"></div>
+
+  <div class="layout">
+
+    <section class="card">
+
+      <div class="title-row">
+        <div>
+          <div class="label">البوابة المختارة</div>
+          <h2 id="gateName">AND — و</h2>
+        </div>
+
+        <span class="pill" id="gateType">مدخلان</span>
+      </div>
+
+      <svg id="gateDrawing"
+           viewBox="0 0 440 180"
+           role="img"
+           aria-label="رسم البوابة المنطقية">
+      </svg>
+
+      <div class="label">تحكّم بالمدخلات</div>
+
+      <div class="inputs" id="inputs"></div>
+
+      <div class="output-box">
+
+        <div>
+          <div class="output-caption">الخرج المنطقي Y</div>
+          <div>حالة المصباح الافتراضي</div>
+        </div>
+
+        <div class="output-display">
+          <div class="led" id="led"></div>
+          <div class="output-value" id="outputValue">0</div>
+        </div>
+
+      </div>
+
+      <div class="actions">
+        <button class="action-button primary" id="nextCase">
+          الحالة التالية ↻
+        </button>
+
+        <button class="action-button" id="reset">
+          إعادة ضبط
+        </button>
+      </div>
+
+    </section>
+
+    <section class="card">
+
+      <div class="label">المعادلة الرياضية</div>
+
+      <h2>كيف تعمل البوابة؟</h2>
+
+      <div class="formula" id="formula">Y = A · B</div>
+
+      <div class="explanation" id="explanation"></div>
+
+      <h3>جدول الحقيقة Truth Table</h3>
+
+      <p style="color:var(--muted);font-size:12px">
+        الصف الملوّن يمثل المدخلات الحالية.
+      </p>
+
+      <div style="overflow-x:auto">
+        <table>
+          <thead id="tableHead"></thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+
+    </section>
+
+    <section class="card full">
+
+      <div class="label">الدليل العملي</div>
+
+      <h2>شلون تشرح المشروع أمام الطلاب؟</h2>
+
+      <div class="steps">
+
+        <div class="step">
+          <b>1 — اختيار البوابة</b>
+          <p>
+            اختَر اسم البوابة من القائمة، واقرأ تعريفها
+            وشاهد رمزها المنطقي.
+          </p>
+        </div>
+
+        <div class="step">
+          <b>2 — تغيير المدخلات</b>
+          <p>
+            اضغط على الأزرار 0 و1 لتغيير المدخل A
+            أو المدخل B، حسب نوع البوابة.
+          </p>
+        </div>
+
+        <div class="step">
+          <b>3 — مراقبة النتيجة</b>
+          <p>
+            راقب المصباح والخرج Y، ثم قارن النتيجة
+            بجدول الحقيقة والمعادلة.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="explanation" style="margin-top:15px">
+        <b>ملاحظة علمية:</b>
+        هذه محاكاة داخل المتصفح وليست دائرة كهربائية حقيقية.
+        القيم 0 و1 تمثل حالتين منطقيتين في الأنظمة الرقمية.
+      </div>
+
+    </section>
+
+  </div>
+</main>
+
+<footer>
+  Logic Gates Lab — مشروع تعليمي تفاعلي
+</footer>
+
+<script>
+const gates = [
+
+{
+  id: "AND",
+  ar: "و",
+  formula: "Y = A · B",
+  inputs: 2,
+  desc:
+    "بوابة AND تعطي الخرج 1 عندما يكون المدخل A والمدخل B كلاهما 1. إذا كان أحد المدخلين يساوي 0، فالخرج يساوي 0.",
+  fn: (a,b) => a & b
+},
+
+{
+  id: "OR",
+  ar: "أو",
+  formula: "Y = A + B",
+  inputs: 2,
+  desc:
+    "بوابة OR تعطي الخرج 1 إذا كان أحد المدخلين على الأقل يساوي 1. يكون الخرج 0 فقط عندما يكون المدخلان كلاهما 0.",
+  fn: (a,b) => a | b
+},
+
+{
+  id: "NOT",
+  ar: "النفي",
+  formula: "Y = NOT A",
+  inputs: 1,
+  desc:
+    "بوابة NOT تعكس قيمة المدخل. عندما يكون A يساوي 0 يصبح Y يساوي 1، وعندما يكون A يساوي 1 يصبح Y يساوي 0.",
+  fn: (a) => a ? 0 : 1
+},
+
+{
+  id: "NAND",
+  ar: "ليس-و",
+  formula: "Y = NOT(A · B)",
+  inputs: 2,
+  desc:
+    "بوابة NAND هي عكس AND. يكون الخرج 0 فقط عندما يكون المدخلان 1 و1، وفي بقية الحالات يكون الخرج 1.",
+  fn: (a,b) => 1 - (a & b)
+},
+
+{
+  id: "NOR",
+  ar: "ليس-أو",
+  formula: "Y = NOT(A + B)",
+  inputs: 2,
+  desc:
+    "بوابة NOR هي عكس OR. تعطي الخرج 1 عندما يكون المدخلان كلاهما 0 فقط، وتعطي 0 إذا كان أحدهما 1.",
+  fn: (a,b) => 1 - (a | b)
+},
+
+{
+  id: "XOR",
+  ar: "أو الحصرية",
+  formula: "Y = A XOR B",
+  inputs: 2,
+  desc:
+    "بوابة XOR تعطي 1 عندما تختلف قيمتا المدخلين. إذا كان A يساوي 0 وB يساوي 1 فالخرج 1، وكذلك بالعكس. إذا تساويا فالخرج 0.",
+  fn: (a,b) => a ^ b
+},
+
+{
+  id: "XNOR",
+  ar: "الحصرية المعكوسة",
+  formula: "Y = NOT(A XOR B)",
+  inputs: 2,
+  desc:
+    "بوابة XNOR هي عكس XOR. تعطي 1 عندما تتساوى قيمتا المدخلين، أي 0 و0 أو 1 و1. وتعطي 0 عندما تختلفان.",
+  fn: (a,b) => 1 - (a ^ b)
+}
+
+];
+
+let selected = "AND";
+let A = 0;
+let B = 0;
+
+const el = id => document.getElementById(id);
+
+function getGate() {
+  return gates.find(g => g.id === selected);
+}
+
+function calculate(g, a = A, b = B) {
+  return g.fn(a,b);
+}
+
+function renderMenu() {
+
+  el("gateMenu").innerHTML = gates.map(g => `
+    <button
+      class="gate-button ${g.id === selected ? "active" : ""}"
+      data-gate="${g.id}">
+      ${g.id}
+      <small>${g.ar}</small>
+    </button>
+  `).join("");
+
+  document.querySelectorAll("[data-gate]").forEach(button => {
+
+    button.addEventListener("click", () => {
+      selected = button.dataset.gate;
+      A = 0;
+      B = 0;
+      render();
+    });
+
+  });
+}
+
+function renderInputs(g) {
+
+  const list = [
+    {name:"A", value:A}
+  ];
+
+  if (g.inputs === 2) {
+    list.push({name:"B", value:B});
+  }
+
+  el("inputs").innerHTML = list.map(input => `
+    <div class="input-box">
+
+      <strong>المدخل ${input.name}</strong>
+
+      <span style="color:var(--muted)">
+        القيمة الحالية:
+        <b>${input.value}</b>
+      </span>
+
+      <div class="input-controls">
+
+        <button
+          data-input="${input.name}"
+          data-value="0"
+          class="${input.value === 0 ? "selected" : ""}">
+          0
+        </button>
+
+        <button
+          data-input="${input.name}"
+          data-value="1"
+          class="${input.value === 1 ? "selected" : ""}">
+          1
+        </button>
+
+      </div>
+    </div>
+  `).join("");
+
+  document.querySelectorAll("[data-input]").forEach(button => {
+
+    button.addEventListener("click", () => {
+
+      const name = button.dataset.input;
+      const value = Number(button.dataset.value);
+
+      if (name === "A") {
+        A = value;
+      } else {
+        B = value;
+      }
+
+      render();
+
+    });
+
+  });
+}
+
+function drawGate(g) {
+
+  const notGate = g.id === "NOT";
+  const inverted = ["NAND","NOR","XNOR","NOT"].includes(g.id);
+  const xorGate = ["XOR","XNOR"].includes(g.id);
+
+  let shape = "";
+
+  if (g.id === "AND" || g.id === "NAND") {
+
+    shape = `
+      <path class="gate-shape"
+        d="M115 40 H205
+           A50 50 0 0 1 205 140
+           H115 Z"/>
+    `;
+
+  } else if (["OR","NOR","XOR","XNOR"].includes(g.id)) {
+
+    shape = `
+      ${xorGate ? `
+        <path class="wire"
+          d="M102 35 Q142 90 102 145"/>
+      ` : ""}
+
+      <path class="gate-shape"
+        d="M115 40
+           Q168 42 205 90
+           Q168 138 115 140
+           Q150 90 115 40 Z"/>
+    `;
+
+  } else {
+
+    shape = `
+      <path class="gate-shape"
+        d="M130 40 L130 140 L238 90 Z"/>
+    `;
+
+  }
+
+  let wires = "";
+
+  if (notGate) {
+
+    wires = `
+      <path class="wire" d="M22 90 H130"/>
+      <path class="wire" d="M258 90 H414"/>
+    `;
+
+  } else {
+
+    const outputStart =
+      ["NAND","NOR","XNOR"].includes(g.id) ? 274 : 255;
+
+    wires = `
+      <path class="wire" d="M22 54 H115"/>
+      <path class="wire" d="M22 126 H115"/>
+      <path class="wire" d="M${outputStart} 90 H414"/>
+    `;
+
+  }
+
+  let bubble = "";
+
+  if (inverted) {
+
+    const x = notGate ? 248 : 255;
+
+    bubble = `
+      <circle cx="${x}" cy="90" r="9"
+        fill="#102d40"
+        stroke="var(--cyan)"
+        stroke-width="3"/>
+    `;
+
+  }
+
+  let labels = `
+    <text class="svg-text"
+      x="35" y="${notGate ? 82 : 46}"
+      text-anchor="middle">A</text>
+
+    <text class="svg-text"
+      x="390" y="78"
+      text-anchor="middle">Y</text>
+  `;
+
+  if (!notGate) {
+
+    labels += `
+      <text class="svg-text"
+        x="35" y="118"
+        text-anchor="middle">B</text>
+    `;
+
+  }
+
+  el("gateDrawing").innerHTML =
+    wires + shape + bubble + labels;
+}
+
+function renderTable(g) {
+
+  if (g.inputs === 1) {
+
+    el("tableHead").innerHTML = `
+      <tr>
+        <th>A</th>
+        <th>Y</th>
+      </tr>
+    `;
+
+  } else {
+
+    el("tableHead").innerHTML = `
+      <tr>
+        <th>A</th>
+        <th>B</th>
+        <th>Y</th>
+      </tr>
+    `;
+
+  }
+
+  let rows = "";
+
+  for (let a = 0; a <= 1; a++) {
+
+    for (let b = 0; b <= (g.inputs === 1 ? 0 : 1); b++) {
+
+      const y = calculate(g,a,b);
+
+      const active =
+        a === A && (g.inputs === 1 || b === B);
+
+      rows += `
+        <tr class="${active ? "current" : ""}">
+
+          <td>${a}</td>
+
+          ${g.inputs === 2 ? `<td>${b}</td>` : ""}
+
+          <td class="${y ? "one" : "zero"}">
+            ${y}
+          </td>
+
+        </tr>
+      `;
+
+    }
+
+  }
+
+  el("tableBody").innerHTML = rows;
+}
+
+function render() {
+
+  const g = getGate();
+  const y = calculate(g);
+
+  renderMenu();
+
+  el("gateName").textContent = `${g.id} — ${g.ar}`;
+
+  el("gateType").textContent =
+    g.inputs === 1 ? "مدخل واحد" : "مدخلان";
+
+  el("formula").textContent = g.formula;
+
+  el("explanation").textContent = g.desc;
+
+  el("outputValue").textContent = y;
+
+  el("led").classList.toggle("on", y === 1);
+
+  renderInputs(g);
+  drawGate(g);
+  renderTable(g);
+}
+
+el("nextCase").addEventListener("click", () => {
+
+  const g = getGate();
+
+  if (g.inputs === 1) {
+
+    A = 1 - A;
+
+  } else if (A === 0 && B === 0) {
+
+    B = 1;
+
+  } else if (A === 0 && B === 1) {
+
+    A = 1;
+    B = 0;
+
+  } else if (A === 1 && B === 0) {
+
+    B = 1;
+
+  } else {
+
+    A = 0;
+    B = 0;
+
+  }
+
+  render();
+
+});
+
+el("reset").addEventListener("click", () => {
+
+  A = 0;
+  B = 0;
+
+  render();
+
+});
+
+render();
+</script>
+
+</body>
+        </html>
